@@ -1,10 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Formulário de Diagnóstico Financeiro</title>
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -104,7 +104,7 @@
 
   <!-- Etapa inicial -->
   <div id="user-info">
-    <h3>Relatório Financeiro</h3>
+    <h3>Diagnóstico Financeiro</h3>
     <input type="text" id="name" placeholder="Seu nome" style="width:100%;padding:8px;margin-bottom:10px;">
     <input type="email" id="email" placeholder="Seu e-mail" style="width:100%;padding:8px;margin-bottom:15px;">
     <button class="next-btn" onclick="startQuiz()">Começar</button>
@@ -123,11 +123,6 @@
 </div>
 
 <script>
-// Inicializa o EmailJS
-(function(){
-  emailjs.init("io9Kgdz7aKy9j_bzK");
-})();
-
 const questions = [
   {q:"Você costuma anotar tudo o que entra e sai de dinheiro da empresa?", o:["Não anoto nada","Anoto às vezes","Sim, faço esse controle com frequência"]},
   {q:"Você costuma olhar com antecedência se terá dinheiro suficiente para pagar as contas do mês?", o:["Não vejo com antecedência","Olho de vez em quando","Sim, sempre vejo isso antes"]},
@@ -217,7 +212,6 @@ function finishQuiz() {
     message = `Parabéns! Sua empresa tem uma base forte.<br><br>Continue firme, e use os dados para crescer com segurança.`;
   }
 
-  // Mostra resultado na tela
   document.getElementById("result").innerHTML = `
     <h2>Sua pontuação: ${score.toFixed(1)}</h2>
     <p>${message}</p>
@@ -233,32 +227,21 @@ function finishQuiz() {
     </div>
   `;
 
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-
-  // Envia para o Google Sheets
+  // Enviar dados para o Google Sheets via Apps Script
   const scriptURL = "https://script.google.com/macros/s/AKfycbyYLJKnVVk4JPame1BRyyv--AUJ_6VXDiXkbU2Ygjl22RFUtXmtqbmEYqZ6Ur7uy_Bd/exec";
-  const data = { nome: name, email: email, pontuacao: score.toFixed(1) };
-  fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) })
-    .then(() => console.log("✅ Dados enviados ao Google Sheets:", data))
-    .catch(error => console.error("❌ Erro ao enviar dados:", error));
 
-  // Envia e-mail via EmailJS
-  const emailParams = {
-    to_name: name,
-    to_email: email,
-    score: score.toFixed(1),
-    message: message.replace(/<br>/g, "\n"),
-    from_name: "Azevedo Contabilidade"
+  const data = {
+    nome: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    pontuacao: score.toFixed(1)
   };
 
-  emailjs.send("service_dzpl15r", "template_5g6j3mp", emailParams)
-    .then(() => {
-      console.log("✅ E-mail enviado com sucesso para", email);
-    })
-    .catch((error) => {
-      console.error("❌ Erro ao enviar e-mail:", error);
-    });
+  fetch(scriptURL, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+  .then(() => console.log("✅ Dados enviados ao Google Sheets:", data))
+  .catch(error => console.error("❌ Erro ao enviar dados:", error));
 }
 </script>
 </body>
