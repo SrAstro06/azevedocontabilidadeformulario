@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulário de Diagnóstico Financeiro</title>
+<style>
+  body { font-family: Arial, sans-serif; background-color: #d9d9d9; display: flex; justify-content: center; align-items: center; height: 100vh; }
+  .container { background-color: #f2f2f2; padding: 30px; border-radius: 15px; text-align: center; width: 320px; position: relative; }
+  .logo { width: 200px; margin-bottom: 20px; }
+  .question-box { background-color: #102d4c; color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; font-weight: bold; font-size: 15px; min-height: 70px; }
+  .option { background-color: #102d4c; color: white; border: none; border-radius: 10px; width: 100%; padding: 10px; margin: 8px 0; cursor: pointer; transition: background-color 0.3s ease; }
+  .option:hover { background-color: #1b3f6b; }
+  .option.selected { background-color: #2ecc71 !important; transform: scale(1.03); transition: all 0.25s ease; }
+  .next-btn { background-color: #ffb400; color: white; border: none; border-radius: 10px; width: 60%; padding: 10px; margin-top: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+  .next-btn:hover { background-color: #e09b00; }
+  .counter { font-size: 12px; color: #555; position: absolute; top: 10px; right: 15px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <img src="VARIAÇÃO 25.png" alt="Logo Azevedo Contabilidade" class="logo">
+
+  <div id="user-info">
+    <h3>Antes de começar</h3>
+    <input type="text" id="name" placeholder="Seu nome" style="width:100%;padding:8px;margin-bottom:10px;">
+    <input type="email" id="email" placeholder="Seu e-mail" style="width:100%;padding:8px;margin-bottom:15px;">
+    <button class="next-btn" onclick="startQuiz()">Começar</button>
+  </div>
+
+  <div id="quiz" class="hidden">
+    <div class="counter" id="counter"></div>
+    <div class="question-box" id="question"></div>
+    <div id="options"></div>
+    <button class="next-btn" onclick="nextQuestion()">Próximo</button>
+  </div>
+
+  <div id="result" class="hidden"></div>
+</div>
+
+<script>
+const questions = [
+  {q:"Você costuma anotar tudo o que entra e sai de dinheiro da empresa?", o:["Não anoto nada","Anoto às vezes","Sim, faço esse controle com frequência"]},
+  {q:"Você costuma olhar com antecedência se terá dinheiro suficiente para pagar as contas do mês?", o:["Não vejo com antecedência","Olho de vez em quando","Sim, sempre vejo isso antes"]},
+  {q:"Você sabe quanto tem em conta hoje e quanto vai precisar pagar nos próximos dias?", o:["Não sei ao certo","Tenho uma ideia","Sim, sei com clareza"]},
+  {q:"Já passou por aperto no caixa por falta de organização ou surpresa nas contas?", o:["Sim, com frequência","Às vezes","Raramente ou nunca"]},
+  {q:"Você usa planilha, caderno ou sistema para acompanhar o dinheiro da empresa?", o:["Não uso nada","Uso alguma coisa, mas é desorganizado","Sim, tenho um controle claro e regular"]},
+  {q:"Você tem controle das contas que precisa pagar? (com datas e valores)", o:["Não controlo","Tenho uma noção","Sim, tenho tudo anotado e organizado"]},
+  {q:"Você sabe quanto tem para receber de clientes ou convênios?", o:["Não sei","Tenho uma ideia geral","Sim, sei os valores e prazos certinhos"]},
+  {q:"O faturamento (emissão de nota ou cobrança) é feito de forma organizada e no prazo certo?", o:["Não é bem organizado","Faço, mas com atrasos às vezes","Sim, faço certinho e no prazo"]},
+  {q:"Existe alguma rotina de cobrança quando o cliente atrasa o pagamento?", o:["Não tenho nenhuma rotina","Faço quando lembro","Sim, tenho um processo de cobrança"]},
+  {q:"Você sabe quanto está em aberto para receber este mês e no próximo?", o:["Não sei","Tenho uma ideia","Sim, sei com precisão"]},
+  {q:"Você fecha o mês da empresa olhando quanto entrou, quanto saiu e quanto sobrou?", o:["Nunca fiz isso","Já fiz, mas não tenho uma rotina","Sim, faço isso todo mês"]},
+  {q:"Você costuma ver relatórios simples com os números da empresa (receita, despesa, lucro)?", o:["Não vejo","Vejo de vez em quando","Sim, acompanho com frequência"]},
+  {q:"Você para para analisar os números da empresa com sócios, equipe ou sozinho?", o:["Não faço isso","Faço às vezes","Sim, faço isso com frequência"]},
+  {q:"Você se sente seguro para tomar decisões financeiras com base nos dados da empresa?", o:["Não me sinto seguro","Às vezes sim, às vezes não","Sim, consigo decidir com confiança"]},
+  {q:"Os dados da empresa (valores, prazos, contas) estão organizados em um lugar fácil de acessar?", o:["Não estão organizados","Estão espalhados ou em papéis","Sim, estão centralizados e atualizados"]}
+];
+
+let currentQuestion = 0;
+let answers = [];
+let selectedValue = null;
+
+function startQuiz(){
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  if(!name || !email){
+    alert("Por favor, preencha seu nome e e-mail.");
+    return;
+  }
+  document.getElementById("user-info").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  loadQuestion();
+}
+
+function loadQuestion(){
+  const q = questions[currentQuestion];
+  document.getElementById("question").innerText = q.q;
+  document.getElementById("counter").innerText = `Pergunta ${currentQuestion+1} de ${questions.length}`;
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+  q.o.forEach((opt, index) => {
+    const btn = document.createElement("button");
+    btn.classList.add("option");
+    btn.textContent = opt;
+    btn.onclick = () => selectOption(btn, index);
+    optionsDiv.appendChild(btn);
+  });
+}
+
+function selectOption(button, value){
+  document.querySelectorAll(".option").forEach(btn => btn.classList.remove("selected"));
+  button.classList.add("selected");
+  selectedValue = value;
+}
+
+function nextQuestion(){
+  if(selectedValue === null){
+    alert("Selecione uma opção antes de continuar!");
+    return;
+  }
+  answers.push(selectedValue);
+  selectedValue = null;
+
+  if(currentQuestion < questions.length - 1){
+    currentQuestion++;
+    loadQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz() {
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+
+  const total = answers.reduce((a,b) => a+b, 0);
+  const score = total / 3; // transforma para 0 a 10
+  let message = "";
+
+  if (score < 4) {
+    message = `Está difícil enxergar os números e tomar decisões.<br><br>Comece organizando o básico: entradas, saídas e contas.`;
+  } else if (score < 7) {
+    message = `Você tem alguma organização, mas pode melhorar muito.<br><br>Vale a pena criar uma rotina de controle e análise simples.`;
+  } else if (score < 9) {
+    message = `Sua gestão já tem boa estrutura.<br><br>É hora de ganhar eficiência e pensar mais no futuro.`;
+  } else {
+    message = `Parabéns! Sua empresa tem uma base forte.<br><br>Continue firme, e use os dados para crescer com segurança.`;
+  }
+
+  document.getElementById("result").innerHTML = `
+    <h2>Sua pontuação: ${score.toFixed(1)}</h2>
+    <p>${message}</p>
+  `;
+
+  // Aqui você pode enviar por e-mail usando EmailJS, por exemplo
+  const templateParams = {
+    user_name: document.getElementById("name").value,
+    user_email: document.getElementById("email").value,
+    score: score.toFixed(1),
+    message: message.replace(/<br>/g, "\n")
+  };
+
+  console.log("Parâmetros para e-mail:", templateParams);
+}
+</script>
+</body>
+</html>
