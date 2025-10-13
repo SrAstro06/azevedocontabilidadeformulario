@@ -131,20 +131,19 @@ function finishQuiz() {
   }
 
   document.getElementById("result").innerHTML = `
-    <h2>Sua pontuação: ${score.toFixed(1)}</h2>
+    <h2>Sua pontuação: ${score.toFixed(1)}/10</h2>
     <p>${message}</p>
-  document.getElementById("result").innerHTML = `
-  <h2>Sua pontuação: ${score.toFixed(1)}/10</h2>
-  <p>${message}</p>
-  <div style="margin-top:30px; font-size:14px; color:#102d4c;">
-    <p><strong>Entre no site e veja como podemos ajudar sua empresa a crescer!</strong></p>
-    <p><a href="https://azevedocontabilidade.com" target="_blank" style="color:#ffb400; text-decoration:none; font-weight:bold;">
-      https://azevedocontabilidade.com
-    </a></p>
-  </div>
-`;
+    <div style="margin-top:30px; font-size:14px; color:#102d4c;">
+      <p><strong>Entre no site e veja como podemos ajudar sua empresa a crescer!</strong></p>
+      <a href="https://azevedocontabilidade.com" target="_blank"
+         style="display:inline-block; background-color:#ffb400; color:white; text-decoration:none;
+                font-weight:bold; border-radius:10px; padding:12px 25px; margin-top:10px;
+                transition:0.3s;">
+         Visite nosso site
+      </a>
+    </div>
+  `;
 
-  // Aqui você pode enviar por e-mail usando EmailJS, por exemplo
   const templateParams = {
     user_name: document.getElementById("name").value,
     user_email: document.getElementById("email").value,
@@ -154,8 +153,10 @@ function finishQuiz() {
 
   console.log("Parâmetros para e-mail:", templateParams);
 }
+
 </script>
 </body>
 </html>
+
 
 
