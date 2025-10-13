@@ -103,7 +103,7 @@
   <img src="VARIAÇÃO 25.png" alt="Logo Azevedo Contabilidade" class="logo">
 
   <div id="user-info">
-    <h3>Antes de começar</h3>
+    <h3>Relatório Financeiro</h3>
     <input type="text" id="name" placeholder="Seu nome" style="width:100%;padding:8px;margin-bottom:10px;">
     <input type="email" id="email" placeholder="Seu e-mail" style="width:100%;padding:8px;margin-bottom:15px;">
     <button class="next-btn" onclick="startQuiz()">Começar</button>
@@ -232,7 +232,40 @@ function finishQuiz() {
   };
 
   console.log("Parâmetros para e-mail:", templateParams);
+
+  <script>
+  // 🔹 Substitua pelo seu link gerado no Google Apps Script
+  const scriptURL = "https://script.google.com/macros/s/AKfycbyYLJKnVVk4JPame1BRyyv--AUJ_6VXDiXkbU2Ygjl22RFUtXmtqbmEYqZ6Ur7uy_Bd/exec";
+
+  // Captura o evento de envio do formulário
+  document.getElementById("formulario").addEventListener("submit", e => {
+    e.preventDefault();
+
+    // Pega os valores dos campos
+    const data = {
+      nome: document.getElementById("nome").value,
+      email: document.getElementById("email").value,
+      pontuacao: document.getElementById("pontuacao").value
+    };
+
+    // Envia os dados pra planilha via POST
+    fetch(scriptURL, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    .then(response => {
+      alert("✅ Resposta enviada com sucesso!");
+      e.target.reset();
+    })
+    .catch(error => {
+      alert("❌ Erro ao enviar a resposta!");
+      console.error(error);
+    });
+  });
+</script>
+
 }
 </script>
 </body>
 </html>
+
